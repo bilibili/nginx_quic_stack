@@ -18,7 +18,7 @@ mkdir build && cd build
 cmake .. && make
 cd -
 ```
-You will have libngxquicstack.so generated in the build directory once the project was successfully compiled，
+You will have libngxquicstack.so generated in the build directory once the project was successfully compiled.
 
 ### Use
 
