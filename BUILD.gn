@@ -1,0 +1,50 @@
+### nginx quic stack build spec
+source_set("ngx_quic_stack_src") {
+  sources = [
+    "src/tQuicAlarmFactory.hh",
+    "src/tQuicAlarmFactory.cc",
+    "src/tQuicClock.hh",
+    "src/tQuicClock.cc",
+    "src/tQuicProofSource.hh",
+    "src/tQuicProofSource.cc",
+    "src/tQuicConnectionHelper.hh",
+    "src/tQuicConnectionHelper.cc",
+    "src/tQuicCryptoServerStream.hh",
+    "src/tQuicCryptoServerStream.cc",
+    "src/tQuicDispatcher.hh",
+    "src/tQuicDispatcher.cc",
+    "src/tQuicServerSession.hh",
+    "src/tQuicServerSession.cc",
+    "src/tQuicServerStream.hh",
+    "src/tQuicServerStream.cc",
+  ]
+  deps = [
+    "//net",
+    "//net:simple_quic_tools",
+    "//net:epoll_quic_tools",
+    "//base",
+    "//base/third_party/dynamic_annotations",
+    "//url",
+  ]
+}
+
+if (is_linux) {
+  shared_library("ngxquicstack") {
+    sources = [
+      "src/quic_stack_api.h",
+      "src/tQuicStack.hh",
+      "src/tQuicStack.cc",
+    ]
+
+    deps = [
+      ":ngx_quic_stack_src",
+      "//net",
+      "//base",
+      "//third_party/boringssl",
+    ]
+
+    ldflags = [
+      "-Wl,-Bsymbolic",
+    ]
+  }
+}
