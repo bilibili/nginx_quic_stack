@@ -686,16 +686,6 @@ void quic_stack_on_alarm_timeout(
   stack->OnAlarmTimeout(deadline_ms);
 }
 
-/*
-void str_replace(std::string &dst, std::string sub_str, std::string replace_str) {
-  std::string::size_type pos = 0;
-  while((pos = dst.find(sub_str)) != std::string::npos) {
-    dst.replace(pos, sub_str.length(), replace_str);
-  }
-  return;
-}
-*/
-
 int quic_stack_supported_versions(
     tQuicStackHandler handler,
     char* buf,
