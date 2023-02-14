@@ -18,7 +18,6 @@
 #include "src/tQuicClock.hh"
 
 namespace nginx {
-
 class tQuicStack {
  public:
   tQuicStack(tQuicStackContext stack_ctx,

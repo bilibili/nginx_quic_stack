@@ -20,7 +20,16 @@ namespace nginx {
 
 namespace {
   const char kSourceAddressTokenSecret[] = "bilibili";
-  const uint64_t scfgExpiryTime  = 4733481600*1000000; //unix timestamp in Microseconds 
+  const uint64_t scfgExpiryTime  = 4733481600*1000000; //unix timestamp in Microseconds
+
+  void str_replace(std::string &dst, std::string sub_str, std::string replace_str) {
+    std::string::size_type pos = 0;
+    while((pos = dst.find(sub_str)) != std::string::npos) {
+      dst.replace(pos, sub_str.length(), replace_str);
+    }
+    return;
+  }
+
 }
 
 
@@ -677,27 +686,34 @@ void quic_stack_on_alarm_timeout(
   stack->OnAlarmTimeout(deadline_ms);
 }
 
+/*
+void str_replace(std::string &dst, std::string sub_str, std::string replace_str) {
+  std::string::size_type pos = 0;
+  while((pos = dst.find(sub_str)) != std::string::npos) {
+    dst.replace(pos, sub_str.length(), replace_str);
+  }
+  return;
+}
+*/
+
 int quic_stack_supported_versions(
     tQuicStackHandler handler,
     char* buf,
-    size_t len)
+    size_t len,
+    uint64_t port,
+    uint64_t max_age)
 {
   nginx::tQuicStack *stack = GET_THIS(handler);
   if (stack == nullptr) {
     return QUIC_STACK_PARAMETER;
   }
 
-  std::string qvl_str;
-  quic::ParsedQuicVersionVector qvv = CurrentSupportedVersions();
-  for (const auto& i : qvv) {
-    if (i.handshake_protocol != quic::HandshakeProtocol::PROTOCOL_QUIC_CRYPTO) {
-      continue;
-    }
-    if (!qvl_str.empty()) {
-      qvl_str.append(",");
-    }
-    qvl_str.append(std::to_string(i.transport_version));
-  }
+  std::string qvl_str = "h3=\":$port\"; ma=$max_age, h3-29=\":$port\"; ma=$max_age, h3-Q050=\":$port\"; ma=$max_age, h3-27=\":$port\"; ma=$max_age, h3-T051=\":$port\"; ma=$max_age, h3-T050=\":$port\"; ma=$max_age, h3-Q046=\":$port\"; ma=$max_age,h3-Q043=\":$port\"; ma=$max_age, quic=\":$port\"; ma=$max_age; v=\"46,43\"";
+  std::string sub_str1 = "$port";
+  std::string sub_str2 = "$max_age";
+
+  nginx::str_replace(qvl_str, sub_str1, std::to_string(port));
+  nginx::str_replace(qvl_str, sub_str2, std::to_string(max_age));
 
   if (qvl_str.size() > len) {
     return QUIC_STACK_SERVER;
